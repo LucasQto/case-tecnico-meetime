@@ -59,6 +59,8 @@ Além disso, optei por criar um Record para representar o modelo de resposta da 
 
 No processamento do endpoint, utilizei o UriComponentsBuilder para a construção da URL. Essa ferramenta torna o código mais legível e facilita a adição de novos parâmetros, se necessário.
 
+Antes de seguir para a próxima etapa, resolvi já aplicar a camada de serviço para delegar responsabilidades. Dessa forma tive um controller mais limpo e uma camada de serviço estruturada para trabalhar a segunda parte do desafio.
+
 Exemplo de Resposta do Endpoint
 
 ~~~json

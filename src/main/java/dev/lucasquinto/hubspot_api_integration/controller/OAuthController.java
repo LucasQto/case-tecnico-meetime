@@ -1,6 +1,7 @@
 package dev.lucasquinto.hubspot_api_integration.controller;
 
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -30,10 +31,10 @@ public class OAuthController {
         .fromUriString(providerUrl)
         .queryParam("client_id", clientId)
         .queryParam("redirect_uri", redirectUri)
-        .queryParam("scope", scope)
+        .queryParam("scope", scope.replace(",", " "))
         .queryParam("response_type", "code")
         .toUriString();
 
         return ResponseEntity.ok(new AuthUrlResponse(authorizationUrl));
-    } 
+    }
 }

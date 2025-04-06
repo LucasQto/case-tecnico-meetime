@@ -1,4 +1,4 @@
-package dev.lucasquinto.hubspot_api_integration.model;
+package dev.lucasquinto.hubspot_api_integration.model.token;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

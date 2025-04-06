@@ -4,5 +4,5 @@ public record ErrorResponse(
     String timestamp,
     String error,
     String message,
-    int httpCode
+    String source
 ) {}

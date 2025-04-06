@@ -1,4 +1,4 @@
-package dev.lucasquinto.hubspot_api_integration.configuration;
+package dev.lucasquinto.hubspot_api_integration.configuration.rest;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -1,6 +1,9 @@
 spring:
   application:
     name: hubspot-api-integration
+  
+  main:
+    allow-bean-definition-overriding: true
 
   security:
     oauth2:
@@ -17,3 +20,8 @@ spring:
           hubspot:
             authorization-uri: https://app.hubspot.com/oauth/authorize
             token-uri: https://api.hubapi.com/oauth/v1/token
+
+hubspot:
+  crm:
+    api-contact:
+      base-url-create: https://api.hubapi.com/crm/v3/objects/contacts

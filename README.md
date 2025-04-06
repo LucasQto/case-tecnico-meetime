@@ -104,3 +104,49 @@ Exemplo de resposta do Endpoint
     "tokenType":"bearer","accessToken":"123456789-fdgdge..."
   }
 ~~~
+
+
+## 📌 Etapa 3: Criação de Contatos
+
+### ✅ Descrição
+
+Foi implementado o endpoint responsável por processar o callback enviado pelo HubSpot, contendo o código de autorização. Esse código permite que a aplicação realize a troca por um token de acesso, essencial para realizar futuras requisições autenticadas aos recursos da API do HubSpot. Essa etapa marca o início efetivo do fluxo OAuth 2.0, possibilitando que o usuário conceda permissões ao aplicativo.
+
+### 📥 Endpoint
+
+POST /hubspot/contacts
+
+### 💭 Estratégia para Implementação
+
+Nesta etapa, foi desenvolvido o endpoint que serve como ponte de integração para criação de contatos com o HubSpot. Busquei aplicar uma melhor organização de camadas e responsabilidades no código, aproveitando para refinar e criar novos módulos.
+
+Implementei filtros para validar o token enviado pelo usuário. A lógica é simples: se o token estiver presente, a requisição é liberada para seguir. Questões como validade ou escopo incorreto são tratadas diretamente pela resposta do HubSpot. Como a aplicação não gerencia autenticação ou sessão, essa abordagem leve foi suficiente para os objetivos do projeto.
+
+Além disso, desenvolvi a lógica de criação de contatos com um controle manual de rate limit com backoff exponencial, seguindo as orientações da documentação oficial do HubSpot. Optei por não utilizar bibliotecas externas, implementando a lógica manualmente.
+
+Durante essa entrega, houve um avanço considerável na estrutura da API, incluindo:
+
+Criação de camadas de segurança via filtros;
+
+Uma camada centralizada para requisições;
+
+Novos modelos de dados;
+
+Exceptions personalizadas com mensagens retornadas no corpo da resposta, como esperado de um proxy.
+
+Observação: A verificação dos campos obrigatórios no corpo da requisição não é rígida, pois o HubSpot aceita payloads com apenas o campo email, por exemplo.
+
+Payload esperado: 
+
+~~~json
+  {
+    "email": "dfgdfdf34@gmail.com",
+    "firstname": "Lucas",
+    "lastname": "Quinto"
+  }
+~~~
+
+A resposta do endpoint caso ocorra tudo bem é:
+
+201
+Contact created successfully

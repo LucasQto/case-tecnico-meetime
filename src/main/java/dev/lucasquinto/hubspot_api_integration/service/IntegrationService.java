@@ -19,9 +19,8 @@ import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import dev.lucasquinto.hubspot_api_integration.exception.custom.HubspotApiException;
 import dev.lucasquinto.hubspot_api_integration.exception.custom.RateLimitExceededException;
-import dev.lucasquinto.hubspot_api_integration.exception.custom.RetryHubspotException;
 import dev.lucasquinto.hubspot_api_integration.model.crm.contact.HubspotContactPayload;
-import dev.lucasquinto.hubspot_api_integration.model.dto.CreateContactRequest;
+import dev.lucasquinto.hubspot_api_integration.model.dto.CreateContactRequestDTO;
 import dev.lucasquinto.hubspot_api_integration.model.exceptions.HubspotErrorResponse;
 import dev.lucasquinto.hubspot_api_integration.model.token.AuthTokenResponse;
 import dev.lucasquinto.hubspot_api_integration.model.token.RequestTokenContext;
@@ -82,6 +81,8 @@ public class IntegrationService {
             }
         });
 
+        log.debug("Sending request to uri: {}", crmCreateContactUri);
+
         return rsClient.post()
             .uri(hubspotTokenUri)
             .contentType(MediaType.APPLICATION_FORM_URLENCODED)
@@ -98,12 +99,14 @@ public class IntegrationService {
     }
 
 
-    public void postCrmContactApi(CreateContactRequest body) {
+    public void postCrmContactApi(CreateContactRequestDTO body) {
         HubspotContactPayload payload = new HubspotContactPayload(body);
         String token = RequestTokenContext.getToken();
     
         int attempt = 1;
         int maxRetries = 3;
+
+        log.debug("Sending request to uri: {}", crmCreateContactUri);
     
         while (attempt <= maxRetries) {
             int currentAttempt = attempt;

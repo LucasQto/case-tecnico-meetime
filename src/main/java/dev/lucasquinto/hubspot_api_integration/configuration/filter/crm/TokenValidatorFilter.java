@@ -1,4 +1,4 @@
-package dev.lucasquinto.hubspot_api_integration.configuration.filter;
+package dev.lucasquinto.hubspot_api_integration.configuration.filter.crm;
 
 import java.io.IOException;
 import java.time.Instant;
@@ -12,8 +12,10 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
+@Slf4j
 public class TokenValidatorFilter extends OncePerRequestFilter {
     
     @Override
@@ -25,13 +27,13 @@ public class TokenValidatorFilter extends OncePerRequestFilter {
 
             RequestTokenContext.setToken(authHeader);
 
+            log.debug("Token used in the current request: {}", authHeader);
+
             try {
                 filterChain.doFilter(request, response);
             } finally {
                 RequestTokenContext.clear();
             }
-
-            filterChain.doFilter(request, response);
         } else {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setContentType("application/json");

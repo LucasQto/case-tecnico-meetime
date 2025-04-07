@@ -114,7 +114,7 @@ Foi implementado o endpoint responsável por processar o callback enviado pelo H
 
 ### 📥 Endpoint
 
-POST /hubspot/contacts
+POST /crm/contacts
 
 ### 💭 Estratégia para Implementação
 
@@ -150,3 +150,47 @@ A resposta do endpoint caso ocorra tudo bem é:
 
 201
 Contact created successfully
+
+## 📌 Etapa 4: Recebimento de Webhook para Criação de Contatos
+
+### ✅ Descrição
+
+Foi implementado um endpoint webhook responsável por receber e processar eventos de criação de contatos enviados pelo HubSpot.
+
+### 📥 Endpoint
+
+POST /hubspot/webhook
+
+### 💭 Estratégia para Implementação
+
+#### Foi necessário adicionar as dependencias do H2 Database e JPA do spring nessa etapa.
+
+Nesta etapa, foi criado um endpoint que escuta eventos do tipo "contact.creation". Para isso, optei por utilizar um DTO para receber os dados enviados na requisição e uma Entity para persistir essas informações no banco de dados. A conversão entre o DTO e a Entity é feita por meio de um método de fábrica na própria Entity.
+
+Decidi armazenar os eventos recebidos no banco de dados como uma forma de garantir que nenhuma informação seja perdida e para possibilitar um eventual reprocessamento, se necessário. Cogitei utilizar o MongoDB, mas considerei que seria um exagero (overengineering) para o escopo deste caso técnico. O H2 Database atendeu bem à necessidade, por ser leve e fácil de configurar.
+
+Cada evento recebido é armazenado na tabela CONTACT_EVENT, utilizando como chave primária o eventId enviado pelo HubSpot. Além disso, foram adicionados alguns logs de debug para facilitar a visualização do fluxo da aplicação, e foi feito um pequeno refinamento na estrutura do projeto.
+
+Também foi necessário criar uma configuração adicional de filtro, pois a documentação do HubSpot deixa claro que é enviado o cabeçalho X-HubSpot-Signature para validar que a requisição realmente vem do HubSpot. Assim, precisei implementar uma validação mais elaborada, já que era necessário ler o corpo da requisição para comparar a assinatura enviada com o client secret e verificar se ela era de fato válida.
+
+Dessa forma, o webhook está protegido e apenas aceita requisições legítimas provenientes do HubSpot.
+
+Request esperado: 
+
+~~~json
+  -H Content-type: application/json,
+  -H X-HubSpot-Signature fsfs2423543sdgdfg...
+
+  {
+    "appId": 10468552,
+    "eventId": 100,
+    "subscriptionId": 3422102,
+    "portalId": 49638027,
+    "occurredAt": 1743992783090,
+    "subscriptionType": "contact.creation",
+    "attemptNumber": 0,
+    "objectId": 123,
+    "changeSource": "CRM",
+    "changeFlag": "NEW"
+  }
+~~~

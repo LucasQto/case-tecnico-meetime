@@ -47,6 +47,8 @@ client_id
 
 client_secret
 
+(É necessario adicionar crm.objects.contacts.read e crm.objects.contacts.write no escopo obrigatório de aplicativo)
+
 Configure as seguintes variáveis no seu arquivo .env localizado no diretorio base do projeto:
 
 ~~~env

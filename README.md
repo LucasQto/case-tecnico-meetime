@@ -95,6 +95,7 @@ https://62b1-179-248-164-4.ngrok-free.app
 🔄 Configuração de OAuth e Webhook no HubSpot
 
 🔗 URL de Callback
+
 Copie a URL do Ngrok e registre no painel do HubSpot:
 
 ![callback-hubspot](docs/images/callback-url-set.png)
@@ -104,6 +105,7 @@ https://<seu-ngrok>.ngrok-free.app/oauth/callback
 ~~~
 
 📩 URL do Webhook
+
 Exemplo de webhook para evento contact.creation:
 
 ~~~text
@@ -120,6 +122,7 @@ GET /oauth/url
 Retorna a URL para autenticação do usuário no HubSpot.
 
 2. Callback com code
+
 Após autenticar, o HubSpot redireciona para o /oauth/callback com um code (Navegador).
 
 A aplicação irá automaticamente trocá-lo por um access token.
@@ -147,8 +150,8 @@ Body:
 Resposta de sucesso:
 
 ~~~text
-201 Created
-Usuário criado com sucesso!
+201
+Contact created successfully!
 ~~~
 
 Exemplo de erro (token expirado):
@@ -180,6 +183,7 @@ Exemplo de erro (token expirado):
 Esse conteúdo será salvo no banco em memória (H2).
 
 🗃️ Acessando o Banco de Dados
+
 Acesse o console H2:
 
 ~~~ text
@@ -191,6 +195,7 @@ Senha: (em branco)
 ~~~
 
 🧼 Dicas de Troubleshooting
+
 Se ocorrer erro na imagem Docker após alterações:
 
 ~~~ bash

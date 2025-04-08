@@ -182,11 +182,9 @@ Acesse o console H2:
 http://localhost:8080/h2-console
 Configuração:
 JDBC URL: jdbc:h2:mem:testdb
-~~~
-
 Username: sa
-
 Senha: (em branco)
+~~~
 
 🧼 Dicas de Troubleshooting
 Se ocorrer erro na imagem Docker após alterações:

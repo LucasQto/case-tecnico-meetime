@@ -1,6 +1,7 @@
 🔗 Integração com HubSpot - Desafio Técnico
 
 🎯 Objetivo
+
 Este projeto implementa uma API REST em Java com Spring Boot para integração com a API do HubSpot, utilizando o fluxo OAuth 2.0 (Authorization Code Flow).
 
     ✅ Funcionalidades
@@ -27,6 +28,7 @@ Este projeto implementa uma API REST em Java com Spring Boot para integração c
 📄 Link para decisões e arquitetura do projeto: [decisões e explicações técnicas](docs/reports/report.md)
 
 🧪 Como Rodar os Testes
+
 Para rodar os testes unitários:
 
 ~~~bash
@@ -34,7 +36,9 @@ mvn test
 ~~~
 
 🔐 Configuração do HubSpot
+
 Crie uma conta de desenvolvedor no HubSpot:
+
 👉 https://developers.hubspot.com
 
 Crie um aplicativo e copie:
@@ -43,7 +47,7 @@ client_id
 
 client_secret
 
-Configure as seguintes variáveis no seu arquivo .env:
+Configure as seguintes variáveis no seu arquivo .env localizado no diretorio base do projeto:
 
 ~~~env
 HUBSPOT_CLIENT_ID=<seu_client_id>

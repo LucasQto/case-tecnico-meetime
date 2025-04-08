@@ -15,13 +15,13 @@ Este projeto implementa uma API REST em Java com Spring Boot para integração c
     🧠 Armazenamento dos eventos recebidos em banco H2 em memória
 
     ⚙️ Tecnologias Utilizadas
-    Ferramenta	Versão
-    Java	    21
-    Spring Boot	3.4.4
-    Maven	    3.9.9
-    Ngrok	    -
-    Docker	    26.1.3
-    Docker Compose	3.8
+    Ferramenta
+    Java	   
+    Spring Boot
+    Maven
+    Ngrok
+    Docker
+    Docker Compose
 
 📁 Documentação de Apoio
 

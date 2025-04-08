@@ -1,196 +1,198 @@
-# 🔗 Integração com HubSpot - Desafio Técnico
+🔗 Integração com HubSpot - Desafio Técnico
 
-## 🎯 Objetivo
-
+🎯 Objetivo
 Este projeto implementa uma API REST em Java com Spring Boot para integração com a API do HubSpot, utilizando o fluxo OAuth 2.0 (Authorization Code Flow).
 
-### Funcionalidades atuais
+    ✅ Funcionalidades
+    🔑 Geração da URL para autenticação OAuth com o HubSpot
 
-✅ Geração de URL para autenticação OAuth com o HubSpot  
-⬜️ Recebimento do callback OAuth e troca do authorization code por access token  
-⬜️ Criação de contatos no CRM HubSpot  
-⬜️ Recebimento de notificações via webhook (ex: contact.creation)
+    🔁 Recebimento do callback OAuth e troca do authorization code por access token
 
----
+    📝 Criação de contatos no CRM HubSpot
 
-## ⚙️ Tecnologias e Versões
+    📩 Recebimento de notificações via Webhook (ex: contact.creation)
 
-| Ferramenta     | Versão   |
-|----------------|----------|
-| Java           | 21       |
-| Spring Boot    | 3.4.4    |
-| Maven          | 3.9.9    |
-| Ngrok (testes) | Opcional |
+    🧠 Armazenamento dos eventos recebidos em banco H2 em memória
 
----
+    ⚙️ Tecnologias Utilizadas
+    Ferramenta	Versão
+    Java	    21
+    Spring Boot	3.4.4
+    Maven	    3.9.9
+    Ngrok	    -
+    Docker	    26.1.3
+    Docker Compose	3.8
 
-## 💡 Considerações inicias
+📁 Documentação de Apoio
 
-Antes de iniciar o projeto, me preocupei bastante em entender como funcionaria todo o fluxo da aplicação e como seria feita a entrega. Com entrega, quero dizer garantir a disponibilidade e a facilidade de execução da aplicação. Minha intenção é que ela seja dockerizada, permitindo fácil uso e configuração, inclusive no que diz respeito às variáveis de ambiente e outros recursos necessários.
+📄 Link para decisões e arquitetura do projeto: [decisões e explicações técnicas](docs/reports/report.md)
 
-Outro ponto que considerei desde o início foi a possível utilização de um banco de dados de cache, como o Redis. Essa ideia surgiu principalmente pensando na manipulação de tokens e também em um possível uso futuro no quarto requisito, relacionado ao recebimento de notificações.
+🧪 Como Rodar os Testes
+Para rodar os testes unitários:
 
-Tendo isso em mente e com um caminho bem definido, decidi começar pelo básico: implementar o fluxo de requisitos de forma funcional e com qualidade. As melhorias e otimizações, como o uso de cache, ficarão para etapas mais avançadas do projeto.
-
-
-## 🔖 Diagrama de sequencia (Simples) para mapeamento do fluxo
-![Arquitetura](docs/images/arquitetura-hubspot-integration.png)
-
-Criei esse diagrama em: https://sequencediagram.org/
-
-## 📌 Etapa 1: Geração da Authorization URL
-
-### ✅ Descrição
-
-Implementado endpoint responsável por gerar e redirecionar o usuário para a URL de autorização do HubSpot. Essa etapa inicia o fluxo OAuth 2.0 e permite ao usuário conceder permissões ao aplicativo.
-
-### 📥 Endpoint
-
-GET /oauth/authorize-url
-
-### 💭 Estratégia para Implementação
-
-O desenvolvimento deste endpoint foi focado em atender ao primeiro requisito do desafio técnico: gerar a URL de autorização do HubSpot para dar início ao fluxo de autenticação OAuth 2.0. Levei em consideração algumas boas práticas de segurança, como:
-
-Evitar exposição de chaves sensíveis, mantendo-as configuráveis via variáveis de ambiente, tanto para desenvolvimento quanto para produção.
-
-Criação de um controller dedicado ao fluxo de OAuth, responsável por atender ao primeiro e segundo requisitos do desafio. Essa separação tem como objetivo garantir clareza no código e facilitar a manutenção futura.
-
-Além disso, optei por criar um Record para representar o modelo de resposta da URL de autorização. Essa abordagem permite flexibilidade, facilitando a personalização da resposta, caso seja necessário.
-
-No processamento do endpoint, utilizei o UriComponentsBuilder para a construção da URL. Essa ferramenta torna o código mais legível e facilita a adição de novos parâmetros, se necessário.
-
-Antes de seguir para a próxima etapa, resolvi já aplicar a camada de serviço para delegar responsabilidades. Dessa forma tive um controller mais limpo e uma camada de serviço estruturada para trabalhar a segunda parte do desafio.
-
-Exemplo de Resposta do Endpoint
-
-~~~json
-  {
-    "authorizationUrl": "https://app.hubspot.com/oauth/authorize?client_id=xyz&redirect_uri=https://host/callback&scope=crm.objects.contacts.read"
-  }
+~~~bash
+mvn test
 ~~~
 
+🔐 Configuração do HubSpot
+Crie uma conta de desenvolvedor no HubSpot:
+👉 https://developers.hubspot.com
 
-## 📌 Etapa 2: Processamento do Callback OAuth
+Crie um aplicativo e copie:
 
-### ✅ Descrição
+client_id
 
-Foi implementado o endpoint responsável por processar o callback enviado pelo HubSpot, contendo o código de autorização. Esse código permite que a aplicação realize a troca por um token de acesso, essencial para realizar futuras requisições autenticadas aos recursos da API do HubSpot. Essa etapa marca o início efetivo do fluxo OAuth 2.0, possibilitando que o usuário conceda permissões ao aplicativo.
+client_secret
 
-### 📥 Endpoint
+Configure as seguintes variáveis no seu arquivo .env:
 
-GET /oauth/callback?code={authorization_code}
-
-### 💭 Estratégia para Implementação
-
-Nesta etapa, foi desenvolvido o endpoint /oauth/callback, responsável por concluir o fluxo Authorization Code Flow. O HubSpot envia uma requisição para esse endpoint com um code via RequestParam. Com esse código, a aplicação realiza um POST para o endpoint de troca de token da API do HubSpot, obtendo o token de acesso.
-
-Durante o desenvolvimento, foi considerada a utilização de um cache (como Redis) para armazenar o hub_id do usuário vinculado ao token, com o objetivo de facilitar o gerenciamento e reutilização futura. No entanto, essa abordagem exigiria que o cliente da aplicação enviasse o hub_id nas requisições futuras, o que poderia tornar o uso mais complexo. Por isso, optou-se por uma resposta mais simples contendo apenas o essencial: token_type e access_token, encapsulados em um DTO.
-
-Além disso, nesta entrega, a estrutura do código foi refinada e organizada. Foi implementado um @ControllerAdvice para tratar erros provenientes de integrações externas (como falhas na comunicação com o HubSpot). Isso permite retornar erros padronizados e legíveis para o cliente, com informações úteis como status, mensagem e correlationId retornado pelo HubSpot.
-
-A exceção é lançada diretamente no método de troca de token, mapeando o corpo da resposta de erro do HubSpot para uma classe customizada. Esse tratamento será aprimorado ainda mais nas próximas etapas.
-
-Para a construção do corpo da requisição de troca de token (que exige o envio dos dados no formato application/x-www-form-urlencoded), foi utilizado o MultiValueMap fornecido pelo Spring Framework. Essa escolha se deu por dois motivos principais:
-
-O formato form-data é o exigido pela API do HubSpot para esse endpoint específico;
-
-O MultiValueMap facilita a construção e leitura do corpo da requisição de forma estruturada e compatível com o RestTemplate ou WebClient, permitindo adição de chaves e valores com clareza e segurança.
-
-Exemplo de resposta do Endpoint
-
-~~~json
-  {
-    "tokenType":"bearer","accessToken":"123456789-fdgdge..."
-  }
+~~~env
+HUBSPOT_CLIENT_ID=<seu_client_id>
+HUBSPOT_CLIENT_SECRET=<seu_client_secret>
+NGROK_AUTHTOKEN=<seu_ngrok_token>
 ~~~
 
+Você pode obter seu token do Ngrok em:
+👉 https://dashboard.ngrok.com/get-started/your-authtoken
 
-## 📌 Etapa 3: Criação de Contatos
+![ngrok-view-dashboard](docs/images/ngrok-token-view.png)
 
-### ✅ Descrição
+🐳 Executando com Docker Compose
 
-Foi implementado o endpoint responsável por processar o callback enviado pelo HubSpot, contendo o código de autorização. Esse código permite que a aplicação realize a troca por um token de acesso, essencial para realizar futuras requisições autenticadas aos recursos da API do HubSpot. Essa etapa marca o início efetivo do fluxo OAuth 2.0, possibilitando que o usuário conceda permissões ao aplicativo.
+1. Gere o JAR da aplicação
 
-### 📥 Endpoint
+~~~bash
+mvn package
+~~~
 
+Este comando já executa os testes automaticamente.
+
+2. Suba os serviços com o Docker Compose
+~~~bash
+docker-compose up --build
+~~~
+
+Isso irá:
+
+Iniciar a aplicação
+
+Criar um túnel com o Ngrok
+
+Expor a API publicamente (essencial para receber webhooks do HubSpot)
+
+3. Acompanhe o log e copie a URL do Ngrok
+Exemplo:
+
+![Ngrok-url](docs/images/url-ngrok.png)
+
+~~~text
+https://62b1-179-248-164-4.ngrok-free.app
+~~~
+
+🔄 Configuração de OAuth e Webhook no HubSpot
+
+🔗 URL de Callback
+Copie a URL do Ngrok e registre no painel do HubSpot:
+
+![callback-hubspot](docs/images/callback-url-set.png)
+
+~~~text
+https://<seu-ngrok>.ngrok-free.app/oauth/callback
+~~~
+
+📩 URL do Webhook
+Exemplo de webhook para evento contact.creation:
+
+~~~text
+https://<seu-ngrok>.ngrok-free.app/hubspot/webhook
+~~~
+
+🚀 Fluxo de Autenticação e Criação de Contato
+
+1. Obter a URL de autenticação OAuth
+~~~bash
+GET /oauth/url
+~~~
+
+Retorna a URL para autenticação do usuário no HubSpot.
+
+2. Callback com code
+Após autenticar, o HubSpot redireciona para o /oauth/callback com um code (Navegador).
+
+A aplicação irá automaticamente trocá-lo por um access token.
+
+Esse token deve ser usado nas requisições para criação de contatos.
+
+3. Criar Contato
+~~~bash
 POST /crm/contacts
-
-### 💭 Estratégia para Implementação
-
-Nesta etapa, foi desenvolvido o endpoint que serve como ponte de integração para criação de contatos com o HubSpot. Busquei aplicar uma melhor organização de camadas e responsabilidades no código, aproveitando para refinar e criar novos módulos.
-
-Implementei filtros para validar o token enviado pelo usuário. A lógica é simples: se o token estiver presente, a requisição é liberada para seguir. Questões como validade ou escopo incorreto são tratadas diretamente pela resposta do HubSpot. Como a aplicação não gerencia autenticação ou sessão, essa abordagem leve foi suficiente para os objetivos do projeto.
-
-Além disso, desenvolvi a lógica de criação de contatos com um controle manual de rate limit com backoff exponencial, seguindo as orientações da documentação oficial do HubSpot. Optei por não utilizar bibliotecas externas, implementando a lógica manualmente.
-
-Durante essa entrega, houve um avanço considerável na estrutura da API, incluindo:
-
-Criação de camadas de segurança via filtros;
-
-Uma camada centralizada para requisições;
-
-Novos modelos de dados;
-
-Exceptions personalizadas com mensagens retornadas no corpo da resposta, como esperado de um proxy.
-
-Observação: A verificação dos campos obrigatórios no corpo da requisição não é rígida, pois o HubSpot aceita payloads com apenas o campo email, por exemplo.
-
-Payload esperado: 
-
-~~~json
-  {
-    "email": "dfgdfdf34@gmail.com",
-    "firstname": "Lucas",
-    "lastname": "Quinto"
-  }
+~~~
+Headers:
+~~~makefile
+Authorization: Bearer <access_token>
 ~~~
 
-A resposta do endpoint caso ocorra tudo bem é:
-
-201
-Contact created successfully
-
-## 📌 Etapa 4: Recebimento de Webhook para Criação de Contatos
-
-### ✅ Descrição
-
-Foi implementado um endpoint webhook responsável por receber e processar eventos de criação de contatos enviados pelo HubSpot.
-
-### 📥 Endpoint
-
-POST /hubspot/webhook
-
-### 💭 Estratégia para Implementação
-
-#### Foi necessário adicionar as dependencias do H2 Database e JPA do spring nessa etapa.
-
-Nesta etapa, foi criado um endpoint que escuta eventos do tipo "contact.creation". Para isso, optei por utilizar um DTO para receber os dados enviados na requisição e uma Entity para persistir essas informações no banco de dados. A conversão entre o DTO e a Entity é feita por meio de um método de fábrica na própria Entity.
-
-Decidi armazenar os eventos recebidos no banco de dados como uma forma de garantir que nenhuma informação seja perdida e para possibilitar um eventual reprocessamento, se necessário. Cogitei utilizar o MongoDB, mas considerei que seria um exagero (overengineering) para o escopo deste caso técnico. O H2 Database atendeu bem à necessidade, por ser leve e fácil de configurar.
-
-Cada evento recebido é armazenado na tabela CONTACT_EVENT, utilizando como chave primária o eventId enviado pelo HubSpot. Além disso, foram adicionados alguns logs de debug para facilitar a visualização do fluxo da aplicação, e foi feito um pequeno refinamento na estrutura do projeto.
-
-Também foi necessário criar uma configuração adicional de filtro, pois a documentação do HubSpot deixa claro que é enviado o cabeçalho X-HubSpot-Signature para validar que a requisição realmente vem do HubSpot. Assim, precisei implementar uma validação mais elaborada, já que era necessário ler o corpo da requisição para comparar a assinatura enviada com o client secret e verificar se ela era de fato válida.
-
-Dessa forma, o webhook está protegido e apenas aceita requisições legítimas provenientes do HubSpot.
-
-Request esperado: 
-
+Body:
 ~~~json
-  -H Content-type: application/json,
-  -H X-HubSpot-Signature fsfs2423543sdgdfg...
+{
+  "email": "example@gmail.com",
+  "firstname": "Tester",
+  "lastname": "Testing"
+}
+~~~
 
-  {
-    "appId": 10468552,
-    "eventId": 100,
-    "subscriptionId": 3422102,
-    "portalId": 49638027,
-    "occurredAt": 1743992783090,
-    "subscriptionType": "contact.creation",
-    "attemptNumber": 0,
-    "objectId": 123,
-    "changeSource": "CRM",
-    "changeFlag": "NEW"
-  }
+Resposta de sucesso:
+
+~~~text
+201 Created
+Usuário criado com sucesso!
+~~~
+
+Exemplo de erro (token expirado):
+~~~json
+{
+  "timestamp": "2025-04-08T04:30:19.053402754Z",
+  "error": "error",
+  "message": "the oauth token used to make this call expired 6 hour(s) ago.",
+  "source": "Hubspot"
+}
+~~~
+
+🔔 Exemplo de Payload de Webhook Recebido
+~~~json
+{
+  "appId": 10468552,
+  "eventId": 100,
+  "subscriptionId": 3422102,
+  "portalId": 49638027,
+  "occurredAt": 1744086192843,
+  "subscriptionType": "contact.creation",
+  "attemptNumber": 0,
+  "objectId": 123,
+  "changeSource": "CRM",
+  "changeFlag": "NEW"
+}
+~~~
+
+Esse conteúdo será salvo no banco em memória (H2).
+
+🗃️ Acessando o Banco de Dados
+Acesse o console H2:
+
+~~~ text
+http://localhost:8080/h2-console
+Configuração:
+JDBC URL: jdbc:h2:mem:testdb
+~~~
+
+Username: sa
+
+Senha: (em branco)
+
+🧼 Dicas de Troubleshooting
+Se ocorrer erro na imagem Docker após alterações:
+
+~~~ bash
+docker system prune -af
+docker-compose up --build
 ~~~

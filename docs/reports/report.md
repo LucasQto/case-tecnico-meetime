@@ -36,7 +36,7 @@ Tendo isso em mente e com um caminho bem definido, decidi começar pelo básico:
 
 
 ## 🔖 Diagrama de sequencia (Simples) para mapeamento do fluxo
-![Arquitetura](docs/images/arquitetura-hubspot-integration.png)
+![Arquitetura](../images/arquitetura-hubspot-integration.png)
 
 Criei esse diagrama em: https://sequencediagram.org/
 

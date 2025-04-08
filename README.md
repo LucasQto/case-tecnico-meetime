@@ -15,7 +15,6 @@ Este projeto implementa uma API REST em Java com Spring Boot para integração c
     🧠 Armazenamento dos eventos recebidos em banco H2 em memória
 
     ⚙️ Tecnologias Utilizadas
-    Ferramenta
     Java	   
     Spring Boot
     Maven

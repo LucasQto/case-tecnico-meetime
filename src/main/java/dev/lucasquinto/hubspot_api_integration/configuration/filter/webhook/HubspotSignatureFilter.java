@@ -49,8 +49,7 @@ public class HubspotSignatureFilter extends OncePerRequestFilter {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 return;
             }
-
-            // tudo certo, deixa seguir
+            log.debug("Signature is valid");
             filterChain.doFilter(cachedRequest, response);
     }
 
@@ -71,5 +70,10 @@ public class HubspotSignatureFilter extends OncePerRequestFilter {
             hexString.append(hex);
         }
         return hexString.toString();
+    }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        return !request.getServletPath().startsWith("/hubspot/webhook");
     }
 }

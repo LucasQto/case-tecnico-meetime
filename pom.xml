@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>dev.lucasquinto</groupId>
 	<artifactId>hubspot-api-integration</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.0-SNAPSHOT</version>
 	<name>hubspot-api-integration</name>
 	<description>Demo project for Spring Boot</description>
 	<url/>
@@ -60,6 +60,11 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-test</artifactId>
 			<scope>test</scope>
@@ -99,6 +104,18 @@
 							<artifactId>lombok</artifactId>
 						</exclude>
 					</excludes>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>3.1.2</version> <!-- ou a que você estiver usando -->
+				<configuration>
+					<environmentVariables>
+					<HUBSPOT_CLIENT_ID>dummy-client-id</HUBSPOT_CLIENT_ID>
+					<HUBSPOT_CLIENT_SECRET>dummy-secret</HUBSPOT_CLIENT_SECRET>
+					<HUBSPOT_REDIRECT_URI>http://localhost</HUBSPOT_REDIRECT_URI>
+					</environmentVariables>
 				</configuration>
 			</plugin>
 		</plugins>

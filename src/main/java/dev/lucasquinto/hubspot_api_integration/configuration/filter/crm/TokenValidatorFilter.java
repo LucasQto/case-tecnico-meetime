@@ -52,4 +52,13 @@ public class TokenValidatorFilter extends OncePerRequestFilter {
             response.getWriter().flush();
         }
     }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getServletPath();
+        if (path == null || path.isEmpty()) {
+            path = request.getRequestURI();
+        }
+        return !path.startsWith("/crm/contacts");
+    }
 }
